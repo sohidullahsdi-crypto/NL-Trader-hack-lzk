@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NL TRADER - Win Go 30S LIVE</title>
+<style>
+  body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
+  
+  /* মেইন ওয়েবসাইট ফ্রেম */
+  #main-site { border: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+  /* ড্র্যাগেবল হ্যাক উইজেট */
+  #hackWidget {
+    position: fixed;
+    top: 30px;
+    right: 20px;
+    width: 250px;
+    background: rgba(8, 10, 15, 0.95);
+    border: 1px solid #00ff66;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 255, 102, 0.3);
+    z-index: 99999;
+    color: #fff;
+    cursor: grab;
+    backdrop-filter: blur(8px);
+    text-align: center;
+  }
+
+  #hackWidget:active { cursor: grabbing; }
+
+  .header { font-size: 12px; color: #00ff66; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 5px; text-transform: uppercase; }
+
+  /* লগইন এরিয়া */
+  #login-area input {
+    width: 100%; padding: 10px; margin-bottom: 10px;
+    background: #000; border: 1px solid #333; color: #00ff66;
+    border-radius: 6px; text-align: center; outline: none;
+  }
+
+  .btn {
+    width: 100%; padding: 10px;
+    background: #00ff66; border: none; color: #000;
+    font-weight: bold; border-radius: 6px; cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  /* সিগন্যাল এরিয়া (শুরুতে লুকানো থাকবে পিরিয়ড সহ) */
+  #signal-area { display: none; }
+
+  .period-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .p-title { font-size: 10px; color: #888; text-transform: uppercase; }
+  #p-number { font-size: 16px; font-weight: bold; color: #00ff66; margin: 5px 0; }
+
+  .timer-container { height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
+  #p-timer { height: 100%; width: 0%; background: #00ff66; transition: width 0.5s linear; }
+
+  #signal-out {
+    font-size: 26px; font-weight: 900; margin: 10px 0;
+    padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;
+    color: #ffd166; letter-spacing: 2px; min-height: 40px;
+  }
+
+  .footer-text { font-size: 9px; color: #555; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+  <iframe id="main-site" src="https://dkwin9.com/#/saasLottery/WinGo?gameCode=WinGo_30S&lottery=WinGo"></iframe>
+
+  <div id="hackWidget">
+    <div class="header">NL TRADER HACK</div>
+
+    <div id="login-area">
+      <input type="password" id="passKey" placeholder="Enter Password">
+      <button class="btn" onclick="checkAuth()">UNLOCK</button>
+    </div>
+
+    <div id="signal-area">
+      <div class="period-info">
+        <div class="p-title">Active Period</div>
+        <div id="p-number">LOADING...</div>
+        <div class="timer-container"><div id="p-timer"></div></div>
+      </div>
+      
+      <div id="signal-out">---</div>
+      <button id="manualBtn" class="btn" style="background: #222; color: #00ff66; border: 1px solid #00ff66;">GET SIGNAL</button>
+      <div class="footer-text">Analysis: 30s Win Go Market</div>
+    </div>
+  </div>
+
+<script>
+  // পিরিয়ড ও টাইমার সিঙ্ক ফাংশন
+  function liveMarketSync() {
+    const now = new Date();
+    const secondsInPeriod = now.getSeconds() % 30; 
+    const remainSeconds = 30 - secondsInPeriod;
+
+    const datePart = now.getFullYear().toString() + 
+                     (now.getMonth() + 1).toString().padStart(2, '0') + 
+                     now.getDate().toString().padStart(2, '0');
+    
+    const totalPeriodsToday = Math.floor((now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 30);
+    const periodID = datePart + "1000" + (1000 + totalPeriodsToday);
+    
+    document.getElementById('p-number').innerText = periodID;
+
+    const progress = (secondsInPeriod / 30) * 100;
+    document.getElementById('p-timer').style.width = progress + "%";
+
+    // অটো সিগন্যাল আপডেট (৫ সেকেন্ড আগে)
+    if (remainSeconds <= 5 && remainSeconds > 4 && document.getElementById('signal-area').style.display === 'block') {
+        startAnalysis();
+    }
+    
+    if (secondsInPeriod === 0) {
+        document.getElementById('signal-out').innerText = "---";
+        document.getElementById('signal-out').style.color = "#ffd166";
+    }
+  }
+
+  // পাসওয়ার্ড চেক এবং পিরিয়ড চালু করা
+  function checkAuth() {
+    const pass = document.getElementById('passKey').value;
+    if(pass === "NL-124DZX") {
+      document.getElementById('login-area').style.display = 'none';
+      document.getElementById('signal-area').style.display = 'block';
+      // লগইন সফল হলেই কেবল টাইমার শুরু হবে
+      setInterval(liveMarketSync, 1000);
+    } else {
+      alert("Wrong Password!");
+    }
+  }
+
+  // সিগন্যাল এনালাইসিস লজিক
+  const predictions = ['BIG', 'SMALL', 'GREEN', 'RED', 'BIG', 'SMALL', 'SMALL', 'GREEN', 'RED', 'BIG'];
+  
+  function startAnalysis() {
+    const out = document.getElementById('signal-out');
+    out.innerText = "WAIT...";
+    setTimeout(() => {
+        const lastDigit = parseInt(document.getElementById('p-number').innerText.slice(-1));
+        const finalSig = predictions[lastDigit % predictions.length];
+        out.innerText = finalSig;
+        out.style.color = (finalSig === 'BIG' || finalSig === 'RED') ? '#ff4d4d' : '#00ff66';
+    }, 1200);
+  }
+
+  document.getElementById('manualBtn').addEventListener('click', startAnalysis);
+
+  // ড্র্যাগেবল (মুভমেন্ট) কোড
+  const widget = document.getElementById("hackWidget");
+  let isMoving = false, shiftX, shiftY;
+
+  const onMoveStart = (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+    isMoving = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    shiftX = clientX - widget.getBoundingClientRect().left;
+    shiftY = clientY - widget.getBoundingClientRect().top;
+  };
+
+  const onMove = (e) => {
+    if (!isMoving) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    widget.style.left = clientX - shiftX + 'px';
+    widget.style.top = clientY - shiftY + 'px';
+    widget.style.right = 'auto';
+  };
+
+  widget.addEventListener('mousedown', onMoveStart);
+  widget.addEventListener('touchstart', onMoveStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove);
+  document.addEventListener('mouseup', () => isMoving = false);
+  document.addEventListener('touchend', () => isMoving = false);
+</script>
+
+</body>
+</html>
